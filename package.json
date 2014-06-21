@@ -1,0 +1,19 @@
+{
+  "name": "playground",
+  "version": "0.0.0",
+  "description": "",
+  "main": "directive.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/hatsjoem/playground.git"
+  },
+  "author": "",
+  "license": " ",
+  "bugs": {
+    "url": "https://github.com/hatsjoem/playground/issues"
+  },
+  "homepage": "https://github.com/hatsjoem/playground"
+}
