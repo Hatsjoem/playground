@@ -8,7 +8,7 @@ angular.module('playground', [])
             transclude: true,
             scope: {
                 highlight: '=',
-                disable: '='                
+                disable: '='
             },
             template: "<div ng-transclude=''></div>" +
                 "<div class='calendar'>" +
@@ -63,9 +63,9 @@ angular.module('playground', [])
                 }
 
                 scope.init = function (date) {
-                    date.setHours(0,0,0,0);
+                    date.setHours(0, 0, 0, 0);
                     var dateTime = date.getTime();
-                    
+
                     scope.currentYear = date.getFullYear();
                     scope.currentMonth = date.getMonth();
                     scope.currentDate = date.getDate();
@@ -89,7 +89,7 @@ angular.module('playground', [])
                                     return h.date == i && h.month == scope.currentMonth && h.year == scope.currentYear;
                                 });
                             day.selected = day.value.getTime() == dateTime;
-                            
+
 
                             if (day.selected)
                                 scope.selectedDay = day;
@@ -123,7 +123,7 @@ angular.module('playground', [])
                                 d.selected = false;
                             })
                         });
-                        _day.selected = true;                       
+                        _day.selected = true;
 
                         if (ngModel) {
                             ngModel.$setViewValue(_day.value);
@@ -144,4 +144,75 @@ angular.module('playground', [])
 
             }
         };
+    })
+    .directive('pgDropdown', function () {
+        return {
+            restrict: 'E',
+            require: 'ngModel',
+            scope: {
+                datasource: '=',
+                wrapperClass: '@',
+                activeClass: '@',
+                dropdownClass: '@',
+                displayProp: '@',
+                valueProp: '@',
+                text: '@'
+            },
+            template: '<div ng-class="getClass()" class="{{wrapperClass}}" ng-click="changeDropdownActive(!dropdownActive)">' +
+                '<span ng-hide="selected">{{text}}</span>' +
+                '<span ng-show="selected">{{selected.display}}</span>' +
+                '<ul ng-class="dropdownClass">' +
+                '<li ng-repeat="item in list track by item.value" ng-click="select(item)">{{item.display}}' +
+                '</li>' +
+                '</ul>' +
+                '</div>',
+            link: function (scope, elem, attrs, ngModel) {
+                scope.selected = null;
+                scope.dropdownActive = false;
+                
+                scope.$watch("datasource", function (newVal) {
+                    if (newVal)
+                        scope.list = newVal.map(function (i) {
+                            return {
+                                value: i[scope.valueProp],
+                                display: i[scope.displayProp]
+                            }
+                        });
+                }, true);
+
+                scope.$watch(function () {
+                    return ngModel.$modelValue;
+                }, function (newValue) {
+                    if (newValue != null && newValue[scope.valueProp] != scope.selected.value) {
+                        scope.selected = {
+                            value: newValue[scope.valueProp],
+                            display: newValue[scope.displayProp]
+                        };
+                    }
+                });
+
+                /* helpers */
+                scope.getClass = function () {
+                    return scope.dropdownActive ? scope.activeClass : '';
+                }
+
+                /* events */
+                scope.select = function (item) {
+                    scope.selected = item;
+
+                    var _selected;
+                    for (var i = 0, length = scope.datasource.length; i < length; i++) {
+                        _selected = scope.datasource[i];
+                        if (_selected[scope.valueProp] == item.value)
+                            break;
+                    }
+
+                    ngModel.$setViewValue(_selected);
+                };
+
+                scope.changeDropdownActive = function (_active) {
+                    scope.dropdownActive = _active;
+                }
+            }
+        }
     });
